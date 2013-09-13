@@ -22,6 +22,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="cc.anr.ReadingBoardActivity"
+            android:label="@string/title_activity_reading_board" >
+        </activity>
+        <activity
+            android:name="cc.anr.GameActivity"
+            android:label="@string/title_activity_game" >
+        </activity>
     </application>
 
 </manifest>
