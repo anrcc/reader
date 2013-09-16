@@ -1,8 +1,12 @@
 package cc.anr.aviews;
 
+import cc.anr.tools.LayoutUtil;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.text.Layout.Alignment;
+import android.text.StaticLayout;
+import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -42,7 +46,8 @@ public class ReadingBoard extends View{
 	
 	
 	
-	private Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+	private Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+	private float mLayoutPositions[] = new float[4096];
 	
 	public ReadingBoard(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -65,11 +70,42 @@ public class ReadingBoard extends View{
 		super.onSizeChanged(w, h, oldw, oldh);
 	}
 
+	
+	
+	@SuppressWarnings("deprecation")
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
+//		TextPaint textPaint=new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
+//		textPaint.setARGB(0xFF, 0xFF, 0, 0);
+//		textPaint.setTextSize(20.0F);
+//		StaticLayout layout = new StaticLayout(txtContent,textPaint,420,Alignment.ALIGN_NORMAL,1.0F,0.0F,true);
+//		//从 (20,80)的位置开始绘制
+//		canvas.translate(0,0);
+//		layout.draw(canvas);
+//		
+		
+//		canvas.drawText(txtContent, 10, 10, paint);
+		
+		
+//		paint.setTextSize(20);
+//		canvas.drawPosText("abc", new float[]{20,20,40,20,60,20}, paint);
+
+		int x=30;
+		int lineSize=18;
+		paint.setTextSize(24);
+		for(int i=0;i<txtContent.length();i+=lineSize){
+			int end=i+lineSize;
+			if(i+lineSize>=txtContent.length()){
+				end=txtContent.length();
+			}
+			canvas.drawText(txtContent.substring(i, end), 0, x, paint);
+			x+=30;
+		}
+		
 	}
 
+	
 	
 	
 	
