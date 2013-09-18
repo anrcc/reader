@@ -3,6 +3,7 @@ package cc.anr.aviews;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -41,7 +42,7 @@ public class ReadingBoard extends View{
 	
 	static StringBuffer txtContent=new StringBuffer(str);
 	private final static String NEW_LINE_STR = "\n";
-	
+	public static final String TEXT_STR = "中";
 	
 	private Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 	private float mLayoutPositions[] = new float[4096];
@@ -100,13 +101,15 @@ public class ReadingBoard extends View{
 //			canvas.drawText(txtContent.substring(i, end), 0, x, paint);
 //			x+=30;
 //		}
-		int x=30;
-		int lineSize=18;
+		
 		paint.setTextSize(24);
+		paint.getTextBounds(TEXT_STR, 0, TEXT_STR.length(), rect);
+		int height=0;
+		int space=5;
 		StringBuilder sb=new StringBuilder();
 		while(getNextLine(sb)){
-			canvas.drawText(sb.toString(), 0, x, paint);
-			x+=30;
+			canvas.drawText(sb.toString(), 0, height, paint);
+			height+=getTextHeight()+space;
 			sb.delete(0, sb.length());
 		}
 		
@@ -144,6 +147,12 @@ public class ReadingBoard extends View{
 	}
 	
 	
+	Rect rect=new Rect();
+	
+	public int getTextHeight(){
+		int mTextHeight = rect.bottom - rect.top;
+		return mTextHeight;
+	}
 	
 	
 
