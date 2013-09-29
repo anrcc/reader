@@ -1,11 +1,20 @@
 package cc.anr.aviews;
 
+import cc.anr.R;
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.Bitmap.Config;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.view.Display;
 import android.view.View;
+import android.view.WindowManager;
 
 public class ReadingBoard extends View{
 
@@ -43,31 +52,29 @@ public class ReadingBoard extends View{
 	static StringBuffer txtContent=new StringBuffer(str);
 	private final static String NEW_LINE_STR = "\n";
 	public static final String TEXT_STR = "中";
+	private int mRenderWidth;
+	private int mRenderHeight;
 	
+	
+	private Bitmap mBackupPageBitmap;
+	private Bitmap mMainPageBitmap;
+	private Canvas mDrawableCanvas;
 	private Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 	private float mLayoutPositions[] = new float[4096];
 	
 	public ReadingBoard(Context context, AttributeSet attrs) {
 		super(context, attrs);
+		Display display = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+		mRenderWidth=display.getWidth();
+		mRenderHeight=display.getHeight();
+		mBackupPageBitmap = Bitmap.createBitmap(480, 800, Config.RGB_565);
+		mMainPageBitmap = Bitmap.createBitmap(480, 800, Config.RGB_565);
+		mDrawableCanvas=new Canvas();
+		
+		
 	}
 
-	@Override
-	protected void onLayout(boolean changed, int left, int top, int right,
-			int bottom) {
-		super.onLayout(changed, left, top, right, bottom);
-	}
-
-	@Override
-	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-	}
 	
-
-	@Override
-	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-		super.onSizeChanged(w, h, oldw, oldh);
-	}
-
 	
 	
 	@SuppressWarnings("deprecation")
@@ -101,6 +108,25 @@ public class ReadingBoard extends View{
 //			canvas.drawText(txtContent.substring(i, end), 0, x, paint);
 //			x+=30;
 //		}
+
+		
+		//canvas.drawBitmap(mMainPageBitmap, 0, 0, null);
+		
+		drawPage(mDrawableCanvas);
+		canvas.drawBitmap(mMainPageBitmap,0, 0, null);
+	}
+	
+	public void drawPage(Canvas canvas){
+		canvas.drawBitmap(mMainPageBitmap, 0, 0, null);
+		canvas.setBitmap(mMainPageBitmap);
+		canvas.save(Canvas.MATRIX_SAVE_FLAG);
+		
+		
+		Rect rect = new Rect();
+		getDrawingRect(rect);
+		Drawable bgDrawable = getReadingDrawable(getResources(), canvas.getWidth(), canvas.getHeight());
+		bgDrawable.setBounds(rect);
+		bgDrawable.draw(canvas);
 		
 		paint.setTextSize(24);
 		paint.getTextBounds(TEXT_STR, 0, TEXT_STR.length(), rect);
@@ -111,13 +137,15 @@ public class ReadingBoard extends View{
 			canvas.drawText(sb.toString(), 0, height, paint);
 			height+=getTextHeight()+space;
 			sb.delete(0, sb.length());
+			System.out.println(sb);
 		}
-		
-		
+		canvas.save(Canvas.ALL_SAVE_FLAG);
+		canvas.restore();
+		//invalidate();
 	}
 
 	
-	int mCharCountOfPage=0;
+	int mCharCountOfPage=0; 
 	int index = 0;
 	int mNewlineIndex=0;
 	int mEndCharIndex=0;
@@ -136,24 +164,71 @@ public class ReadingBoard extends View{
 				mEndCharIndex=mNewlineIndex;
 			}
 		}
-		int charCount = paint.breakText(txtContent, index, mEndCharIndex, true, 420, null);
+		int charCount = paint.breakText(txtContent, index, mEndCharIndex, true, mRenderWidth, null);
 		sb.append(txtContent, index, index + charCount);
 		mCharCountOfPage+=charCount;
-		System.out.println(sb);
-//		if(mCharCountOfPage == mNewlineIndex){
-//			++mNewlineIndex;
-//		}
 		return flag;
 	}
 	
 	
 	Rect rect=new Rect();
-	
 	public int getTextHeight(){
 		int mTextHeight = rect.bottom - rect.top;
 		return mTextHeight;
 	}
 	
 	
+	
+	@Override
+	protected void onLayout(boolean changed, int left, int top, int right,
+			int bottom) {
+		super.onLayout(changed, left, top, right, bottom);
+	}
 
+	@Override
+	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+	}
+	
+
+	@Override
+	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+		super.onSizeChanged(w, h, oldw, oldh);
+	}
+
+	
+	private void staticDragDraw(Canvas canvas) {
+		//canvas.drawBitmap(mBackupPageBitmap, mDraggingBitmapX, 0, null);
+	}
+	
+
+	
+	public Drawable getReadingDrawable(Resources res, int reqWidth, int reqHeight) {
+		return new BitmapDrawable(loadBitmapInRes(res, R.drawable.reading_bg_1, reqWidth, reqHeight));
+	}
+	
+	public static Bitmap loadBitmapInRes(Resources res, int resId, int reqWidth, int reqHeight) {
+		if(resId <= 0 || reqWidth <= 0 || reqHeight <= 0) return null;
+		
+		BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inJustDecodeBounds = true;
+		BitmapFactory.decodeResource(res, resId, options);
+		if(options.outWidth <= 0 || options.outHeight <= 0) return null;
+		
+		int inSampleSize = calculateInSampleSize(options.outWidth, options.outHeight, reqWidth, reqHeight);
+		if(inSampleSize <= 1) return BitmapFactory.decodeResource(res, resId);
+		
+		options.inSampleSize = inSampleSize;
+		options.inJustDecodeBounds = false;
+		
+		return BitmapFactory.decodeResource(res, resId, options);
+	}
+	
+	public static int calculateInSampleSize(int outWidth, int outHeight, int reqWidth, int reqHeight) {
+		int inSampleSize = 1;
+		if(outHeight > reqHeight || outWidth > reqWidth) {
+			inSampleSize = Math.round(outWidth > outHeight ? outHeight / reqHeight : outWidth / reqWidth);
+		}
+		return inSampleSize;
+	}
 }
