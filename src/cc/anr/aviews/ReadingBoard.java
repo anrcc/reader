@@ -9,6 +9,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Bitmap.Config;
+import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
@@ -50,8 +51,11 @@ public class ReadingBoard extends View{
 			"七月低下头有些难过。她说，那我呢。安生说，你和我一起走。 ";
 	
 	static StringBuffer txtContent=new StringBuffer(str);
+	
+	Rect rect=new Rect();
 	private final static String NEW_LINE_STR = "\n";
 	public static final String TEXT_STR = "中";
+	
 	private int mRenderWidth;
 	private int mRenderHeight;
 	
@@ -60,7 +64,7 @@ public class ReadingBoard extends View{
 	private Bitmap mMainPageBitmap;
 	private Canvas mDrawableCanvas;
 	private Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-	private float mLayoutPositions[] = new float[4096];
+//	private float mLayoutPositions[] = new float[4096];
 	
 	public ReadingBoard(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -68,70 +72,37 @@ public class ReadingBoard extends View{
 		mRenderWidth=display.getWidth();
 		mRenderHeight=display.getHeight();
 		mBackupPageBitmap = Bitmap.createBitmap(480, 800, Config.RGB_565);
-		mMainPageBitmap = Bitmap.createBitmap(480, 800, Config.RGB_565);
+		mMainPageBitmap = Bitmap.createBitmap(mRenderWidth, mRenderHeight, Config.RGB_565);
 		mDrawableCanvas=new Canvas();
-		
-		
 	}
 
 	
 	
 	
-	@SuppressWarnings("deprecation")
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
-//		TextPaint textPaint=new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
-//		textPaint.setARGB(0xFF, 0xFF, 0, 0);
-//		textPaint.setTextSize(20.0F);
-//		StaticLayout layout = new StaticLayout(txtContent,textPaint,420,Alignment.ALIGN_NORMAL,1.0F,0.0F,true);
-//		//从 (20,80)的位置开始绘制
-//		canvas.translate(0,0);
-//		layout.draw(canvas);
-//		
-		
-//		canvas.drawText(txtContent, 10, 10, paint);
-		
-		
-//		paint.setTextSize(20);
-//		canvas.drawPosText("abc", new float[]{20,20,40,20,60,20}, paint);
-
-		
-//		int x=30;
-//		int lineSize=18;
-//		paint.setTextSize(24);
-//		for(int i=0;i<txtContent.length();i+=lineSize){
-//			int end=i+lineSize;
-//			if(i+lineSize>=txtContent.length()){
-//				end=txtContent.length();
-//			}
-//			canvas.drawText(txtContent.substring(i, end), 0, x, paint);
-//			x+=30;
-//		}
-
-		
-		//canvas.drawBitmap(mMainPageBitmap, 0, 0, null);
-		
 		drawPage(mDrawableCanvas);
-		canvas.drawBitmap(mMainPageBitmap,0, 0, null);
+		canvas.drawBitmap(mMainPageBitmap, 0, 0, null);
+		canvas.drawBitmap(mMainPageBitmap, 100, 0, null);
 	}
 	
 	public void drawPage(Canvas canvas){
-		canvas.drawBitmap(mMainPageBitmap, 0, 0, null);
+		//canvas.setBitmap(mBackupPageBitmap);
+		//canvas.drawBitmap(mMainPageBitmap, 0, 0, null);
 		canvas.setBitmap(mMainPageBitmap);
 		canvas.save(Canvas.MATRIX_SAVE_FLAG);
 		
-		
-		Rect rect = new Rect();
 		getDrawingRect(rect);
-		Drawable bgDrawable = getReadingDrawable(getResources(), canvas.getWidth(), canvas.getHeight());
+		Resources res = getResources();
+		Drawable bgDrawable = res.getDrawable(R.drawable.reading_bg_1);
 		bgDrawable.setBounds(rect);
 		bgDrawable.draw(canvas);
 		
 		paint.setTextSize(24);
 		paint.getTextBounds(TEXT_STR, 0, TEXT_STR.length(), rect);
 		int height=0;
-		int space=5;
+		int space=25;
 		StringBuilder sb=new StringBuilder();
 		while(getNextLine(sb)){
 			canvas.drawText(sb.toString(), 0, height, paint);
@@ -141,7 +112,6 @@ public class ReadingBoard extends View{
 		}
 		canvas.save(Canvas.ALL_SAVE_FLAG);
 		canvas.restore();
-		//invalidate();
 	}
 
 	
@@ -171,64 +141,10 @@ public class ReadingBoard extends View{
 	}
 	
 	
-	Rect rect=new Rect();
+	
 	public int getTextHeight(){
 		int mTextHeight = rect.bottom - rect.top;
 		return mTextHeight;
 	}
 	
-	
-	
-	@Override
-	protected void onLayout(boolean changed, int left, int top, int right,
-			int bottom) {
-		super.onLayout(changed, left, top, right, bottom);
-	}
-
-	@Override
-	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-	}
-	
-
-	@Override
-	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-		super.onSizeChanged(w, h, oldw, oldh);
-	}
-
-	
-	private void staticDragDraw(Canvas canvas) {
-		//canvas.drawBitmap(mBackupPageBitmap, mDraggingBitmapX, 0, null);
-	}
-	
-
-	
-	public Drawable getReadingDrawable(Resources res, int reqWidth, int reqHeight) {
-		return new BitmapDrawable(loadBitmapInRes(res, R.drawable.reading_bg_1, reqWidth, reqHeight));
-	}
-	
-	public static Bitmap loadBitmapInRes(Resources res, int resId, int reqWidth, int reqHeight) {
-		if(resId <= 0 || reqWidth <= 0 || reqHeight <= 0) return null;
-		
-		BitmapFactory.Options options = new BitmapFactory.Options();
-		options.inJustDecodeBounds = true;
-		BitmapFactory.decodeResource(res, resId, options);
-		if(options.outWidth <= 0 || options.outHeight <= 0) return null;
-		
-		int inSampleSize = calculateInSampleSize(options.outWidth, options.outHeight, reqWidth, reqHeight);
-		if(inSampleSize <= 1) return BitmapFactory.decodeResource(res, resId);
-		
-		options.inSampleSize = inSampleSize;
-		options.inJustDecodeBounds = false;
-		
-		return BitmapFactory.decodeResource(res, resId, options);
-	}
-	
-	public static int calculateInSampleSize(int outWidth, int outHeight, int reqWidth, int reqHeight) {
-		int inSampleSize = 1;
-		if(outHeight > reqHeight || outWidth > reqWidth) {
-			inSampleSize = Math.round(outWidth > outHeight ? outHeight / reqHeight : outWidth / reqWidth);
-		}
-		return inSampleSize;
-	}
 }

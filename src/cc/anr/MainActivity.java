@@ -21,6 +21,7 @@ public class MainActivity extends Activity {
 	
 	Button inReadingActivityBut;
 	Button inGameBut;
+	Button inTestViewBut;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +33,7 @@ public class MainActivity extends Activity {
 		mainText=(TextView) findViewById(R.id.mainText);
 		inReadingActivityBut=(Button)findViewById(R.id.inReadingActivityBut);
 		inGameBut=(Button)findViewById(R.id.inGameBut);
+		inTestViewBut=(Button)findViewById(R.id.inTestViewBut);
 		floatImageText=(FloatImageText) findViewById(R.id.floatImageText);
 		
 		Bitmap bitmap=BitmapFactory.decodeResource(getResources(),R.drawable.ic_launcher);
@@ -52,6 +54,16 @@ public class MainActivity extends Activity {
 			public void onClick(View v) {
 				Intent in=new Intent();
 				in.setClass(getApplicationContext(), GameActivity.class);
+				startActivity(in);
+			}
+		});
+		
+		inTestViewBut.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Intent in=new Intent();
+				in.setClass(getApplicationContext(), TestViewActivity.class);
 				startActivity(in);
 			}
 		});

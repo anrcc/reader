@@ -30,6 +30,10 @@
             android:name="cc.anr.GameActivity"
             android:label="@string/title_activity_game" >
         </activity>
+        <activity
+            android:name="cc.anr.TestViewActivity"
+            android:label="@string/title_activity_test_view" >
+        </activity>
     </application>
 
 </manifest>
