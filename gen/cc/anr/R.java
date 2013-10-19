@@ -54,14 +54,15 @@ public final class R {
         public static final int reading_guide_3=0x7f020008;
     }
     public static final class id {
-        public static final int action_settings=0x7f080007;
-        public static final int floatImageText=0x7f080004;
+        public static final int action_settings=0x7f080008;
+        public static final int floatImageText=0x7f080005;
         public static final int inGameBut=0x7f080001;
         public static final int inReadingActivityBut=0x7f080000;
+        public static final int inTestCanvasBut=0x7f080003;
         public static final int inTestViewBut=0x7f080002;
-        public static final int mainText=0x7f080003;
-        public static final int readingBoard=0x7f080005;
-        public static final int testView=0x7f080006;
+        public static final int mainText=0x7f080004;
+        public static final int readingBoard=0x7f080006;
+        public static final int testView=0x7f080007;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;

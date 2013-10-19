@@ -18,6 +18,11 @@
         android:layout_height="wrap_content" 
         android:text="TestView"/>
     
+    <Button android:id="@+id/inTestCanvasBut" 
+        android:layout_width="fill_parent" 
+        android:layout_height="wrap_content" 
+        android:text="TnTestCanvasBut"/>
+    
     <TextView android:id="@+id/mainText"
         android:layout_width="fill_parent"
         android:layout_height="200dip"

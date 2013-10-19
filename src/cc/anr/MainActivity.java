@@ -22,6 +22,7 @@ public class MainActivity extends Activity {
 	Button inReadingActivityBut;
 	Button inGameBut;
 	Button inTestViewBut;
+	Button inTestCanvasBut;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -31,9 +32,12 @@ public class MainActivity extends Activity {
 		gestureDetector=new GestureDetector(this, new LearnGestureListener());
 		setContentView(R.layout.activity_main);
 		mainText=(TextView) findViewById(R.id.mainText);
+		
 		inReadingActivityBut=(Button)findViewById(R.id.inReadingActivityBut);
 		inGameBut=(Button)findViewById(R.id.inGameBut);
 		inTestViewBut=(Button)findViewById(R.id.inTestViewBut);
+		inTestCanvasBut=(Button)findViewById(R.id.inTestCanvasBut);
+		
 		floatImageText=(FloatImageText) findViewById(R.id.floatImageText);
 		
 		Bitmap bitmap=BitmapFactory.decodeResource(getResources(),R.drawable.ic_launcher);
@@ -64,6 +68,15 @@ public class MainActivity extends Activity {
 			public void onClick(View v) {
 				Intent in=new Intent();
 				in.setClass(getApplicationContext(), TestViewActivity.class);
+				startActivity(in);
+			}
+		});
+		inTestCanvasBut.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Intent in=new Intent();
+				in.setClass(getApplicationContext(), TestCanvasActivity.class);
 				startActivity(in);
 			}
 		});
